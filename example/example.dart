@@ -1,82 +1,78 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:waveprogressbar_flutter/waveprogressbar_flutter.dart';
 
-class BezierCurveDemo extends StatefulWidget{
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  // This widget is the root of your application.
   @override
-  State<StatefulWidget> createState() {
-    return BezierCurveDemoState();
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      themeMode: ThemeMode.dark,
+      darkTheme: ThemeData(
+          // listTileTheme: ListTileThemeData(iconColor: Colors.white),
+          useMaterial3: true,
+          // iconButtonTheme: IconButtonThemeData(
+          //     style: IconButton.styleFrom(foregroundColor: Colors.white)),
+          // iconTheme: IconThemeData(color: Colors.white),
+          textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                  alignment: Alignment.centerLeft,
+                  foregroundColor: Colors.white)),
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.green.shade400)),
+      theme: ThemeData(
+        useMaterial3: true,
+      ),
+      home: DashboardScreen(),
+    );
   }
 }
 
-class BezierCurveDemoState extends State<BezierCurveDemo>{
+class DashboardScreen extends StatefulWidget {
+  const DashboardScreen({super.key});
 
-  final TextEditingController _controller = new TextEditingController();
-  //默认初始值为0.0
-  double waterHeight=0.0;
-  WaterController waterController=WaterController();
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  double progress = 0;
+  WaterController waterController = WaterController();
+  late TextEditingController textController;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding widgetsBinding=WidgetsBinding.instance;
-    widgetsBinding.addPostFrameCallback((callback){
-      //这里写你想要显示的百分比
-      waterController.changeWaterHeight(0.82);
-    });
+    textController = TextEditingController();
   }
-
 
   @override
   Widget build(BuildContext context) {
-
-    return new Scaffold(
-      resizeToAvoidBottomPadding: false,
-      appBar: new AppBar(
-        title: new Text("贝塞尔曲线测试"),
-      ),
-      body: new Column(
-        children: <Widget>[
-          new Row(
-            children: <Widget>[
-              new Text("高度调整:    ",
-                style: new TextStyle(fontSize: 20.0),
-              ),
-              new Container(
-                width: 150.0,
-                child: new TextField(
-                    controller: _controller,
-                    decoration: new InputDecoration(
-                      hintText: "请输入高度",
-                    )
-                ),
-              ),
-              new RaisedButton(onPressed: (){
-                print("waterHeight is ${_controller.toString()}");
-                FocusScope.of(context).requestFocus(FocusNode());
-                waterController.changeWaterHeight(double.parse(_controller.text));
-              },
-                child: new Text("确定"),
-              ),
-            ],
-          ),
-          new Container(
-            margin: EdgeInsets.only(top: 80.0),
-            child: new Center(
-              child: new WaveProgressBar(
-                flowSpeed: 2.0,
-                waveDistance:45.0,
-                waterColor: Color(0xFF68BEFC),
-                //strokeCircleColor: Color(0x50e16009),
-                heightController: waterController,
-                percentage: waterHeight,
-                size: new Size (300,300),
-                textStyle: new TextStyle(
-                    color:Color(0x15000000),
-                    fontSize: 60.0,
-                    fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
+    return Scaffold(
+      body: Column(
+        children: [
+          WaveProgressBar(
+              size: Size(80, 80),
+              percentage: progress / 100,
+              textStyle: Theme.of(context).textTheme.headlineLarge,
+              barType: WaveProgressBarType.square,
+              waterColor: Colors.red,
+              heightController: waterController),
+          TextField(
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.allow(RegExp("[0-9]"))],
+            controller: textController,
+            onSubmitted: (String value) {
+              progress = double.parse(textController.text);
+              waterController.changeWaterHeight(progress / 100);
+            },
+          )
         ],
       ),
     );
