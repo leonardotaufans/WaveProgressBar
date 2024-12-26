@@ -1,112 +1,78 @@
 # waveprogressbar
-[![pub package](https://img.shields.io/pub/v/waveprogressbar_flutter.svg)](https://pub.dartlang.org/packages/waveprogressbar_flutter)
 
-双平台通用,可动态调整进度，可自定义大小尺寸等
+Readme in progress, idk how to add this to pub.dev
 
-It is a good widget,can compatible with Android and IOS,Adjustable progress,Customizable color and size
+Cloned from https://github.com/baoolong/WaveProgressBar, upgraded to Dart 3.0 and with added features.
 
-如果使用当中有什么问题，请在github里提出个issues,thankYou
+![display](https://github.com/leonardotaufans/WaveProgressBar/blob/master/example/WaveProgressBar.gif)
 
-If there is any problem with the use, please submit an issue in github,thankYou
-
-#### My organization's github：[https://github.com/OpenFlutter](https://github.com/OpenFlutter)
-
-#### Contact Me ：OpenFlutter QQ群 892398530
-
-<img width="38%" height="38%" src="https://raw.githubusercontent.com/baoolong/PullToRefresh/master/demonstrationgif/20181229_155650.gif"/>
+### Square Progress Bar
+![square](https://github.com/leonardotaufans/WaveProgressBar/blob/master/example/WaveProgressBar_square.gif)
+### Circular Progress Bar
+![circular](https://github.com/leonardotaufans/WaveProgressBar/blob/master/example/WaveProgressBar_circular.gif)
 
 ## Usage
 
-Add this to your package's pubspec.yaml file:
-
-    dependencies:
-	  waveprogressbar_flutter: "^0.1.1"
-
-Add it to your dart file:
-
-    import 'package:waveprogressbar_flutter/waveprogressbar_flutter.dart';
-
+1. Copy lib/waveprogressbar_flutter.dart to your lib folder.
+2. Import it to your dart file:
+    import 'package:[your_package]/waveprogressbar_flutter.dart';
+3. Initialize the WaterController on your class:
+    WaterController _controller = WaterController();
+4. Add it as your widget (remember to make the class Stateful!):
+    WaveProgressBar(
+      size: Size(80, 80), // Size of your widget
+      percentage: 0.4,  // Double, range from 0 to 1
+      textStyle: DefaultTextStyle(),  // Style of the percentage itself
+      barType: WaveProgressBarType.square,  // Optional: Progress Bar shape, defaults to circular
+      heightController: _controller  // The controller previously initialized
+    )
+5. To change the progress bar, use WaterController's method changeWaterHeight. Keep in mind that the progress bar is double from 0-1:
+    _controller.changeWaterHeight(progress)  
+    
 ## Example
 
     import 'package:flutter/material.dart';
-    import 'package:waveprogressbar_flutter/waveprogressbar_flutter.dart';
+    import 'package:my/waveprogressbar_flutter.dart';
     
-    class BezierCurveDemo extends StatefulWidget{
+    class DashboardScreen extends StatefulWidget {
+      const DashboardScreen({super.key});
+
       @override
-      State<StatefulWidget> createState() {
-        return BezierCurveDemoState();
-      }
+      State<DashboardScreen> createState() => _DashboardScreenState();
     }
-    
-    class BezierCurveDemoState extends State<BezierCurveDemo>{
-    
-      final TextEditingController _controller = new TextEditingController();
-      //默认初始值为0.0
-      double waterHeight=0.0;
-      WaterController waterController=WaterController();
-    
+
+    class _DashboardScreenState extends State<DashboardScreen> {
+      double progress = 0;
+      WaterController waterController = WaterController();
+      late TextEditingController textController;
+
       @override
       void initState() {
         super.initState();
-        WidgetsBinding widgetsBinding=WidgetsBinding.instance;
-        widgetsBinding.addPostFrameCallback((callback){
-          //这里写你想要显示的百分比
-          waterController.changeWaterHeight(0.82);
-        });
+        textController = TextEditingController();
       }
-    
-    
+
       @override
       Widget build(BuildContext context) {
-    
-        return new Scaffold(
-          resizeToAvoidBottomPadding: false,
-          appBar: new AppBar(
-            title: new Text("贝塞尔曲线测试"),
-          ),
-          body: new Column(
-            children: <Widget>[
-              new Row(
-                children: <Widget>[
-                  new Text("高度调整:    ",
-                    style: new TextStyle(fontSize: 20.0),
-                  ),
-                  new Container(
-                    width: 150.0,
-                    child: new TextField(
-                        controller: _controller,
-                        decoration: new InputDecoration(
-                          hintText: "请输入高度",
-                        )
-                    ),
-                  ),
-                  new RaisedButton(onPressed: (){
-                    print("waterHeight is ${_controller.toString()}");
-                    FocusScope.of(context).requestFocus(FocusNode());
-                    waterController.changeWaterHeight(double.parse(_controller.text));
-                  },
-                    child: new Text("确定"),
-                  ),
-                ],
-              ),
-              new Container(
-                margin: EdgeInsets.only(top: 80.0),
-                child: new Center(
-                  child: new WaveProgressBar(
-                    flowSpeed: 2.0,
-                    waveDistance:45.0,
-                    waterColor: Color(0xFF68BEFC),
-                    //strokeCircleColor: Color(0x50e16009),
-                    heightController: waterController,
-                    percentage: waterHeight,
-                    size: new Size (300,300),
-                    textStyle: new TextStyle(
-                        color:Color(0x15000000),
-                        fontSize: 60.0,
-                        fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
+        return Scaffold(
+          body: Column(
+            children: [
+              WaveProgressBar(
+                  size: Size(80, 80),
+                  percentage: progress / 100,
+                  textStyle: Theme.of(context).textTheme.headlineLarge,
+                  barType: WaveProgressBarType.square,
+                  waterColor: Colors.red,
+                  heightController: waterController),
+              TextField(
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.allow(RegExp("[0-9]"))],
+                controller: textController,
+                onSubmitted: (String value) {
+                  progress = double.parse(textController.text);
+                  waterController.changeWaterHeight(progress / 100);
+                },
+              )
             ],
           ),
         );
@@ -117,14 +83,15 @@ Add it to your dart file:
 
 | properties         | type             | description                       |
 | ----               | ----             | ----                              |
-| size               | Size             |   控件大小 The size of widget    	|
-| percentage         | double      		|   进度百分比 Percentage of progress	|
-| waveHeight         | double      		|   浪高 The wave height   			|
-| textStyle          | TextStyle      	|   文字样式 text style    			|
-| waveDistance       | double      		|   1/4波距 ；1/4 Wave distance    	|
-| flowSpeed          | double      		|   波浪滚动的速度 The speed of wave 	|
-| waterColor         | Color      		|   水的颜色 water color    			|
-| strokeCircleColor  | Color      		|   圆环的颜色 Stroke Circle Color   	|
-| circleStrokeWidth  | double      		|   圆环的宽度 Circle Stroke Width   	|
-| heightController   | WaterController  |   进度控制器 progress Controller   	|
+| size               | Size             |   The size of widget    	|
+| percentage         | double      		|   Percentage of progress	|
+| waveHeight         | double      		|   The wave height   			|
+| textStyle          | TextStyle      	|   text style    			|
+| waveDistance       | double      		|   1/4 Wave distance    	|
+| flowSpeed          | double      		|   The speed of wave 	|
+| waterColor         | Color      		|   Water color    			|
+| strokeCircleColor  | Color      		|   Stroke Circle Color   	|
+| circleStrokeWidth  | double      		|   Circle Stroke Width   	|
+| heightController   | WaterController  |   Progress Controller   	|
+| WaveProgressBarType | WaveProgressBarType | The type of progress bar (circular or square) |
 
