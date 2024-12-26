@@ -19,15 +19,19 @@ Cloned from https://github.com/baoolong/WaveProgressBar, upgraded to Dart 3.0 an
 3. Initialize the WaterController on your class:
     WaterController _controller = WaterController();
 4. Add it as your widget (remember to make the class Stateful!):
-    WaveProgressBar(
-      size: Size(80, 80), // Size of your widget
-      percentage: 0.4,  // Double, range from 0 to 1
-      textStyle: DefaultTextStyle(),  // Style of the percentage itself
-      barType: WaveProgressBarType.square,  // Optional: Progress Bar shape, defaults to circular
-      heightController: _controller  // The controller previously initialized
-    )
-5. To change the progress bar, use WaterController's method changeWaterHeight. Keep in mind that the progress bar is double from 0-1:
-    _controller.changeWaterHeight(progress)  
+    ```dart
+   WaveProgressBar(
+        size: Size(80, 80), // Size of your widget
+        percentage: 0.4,  // Double, range from 0 to 1
+        textStyle: DefaultTextStyle(),  // Style of the percentage itself
+        barType: WaveProgressBarType.square,  // Optional: Progress Bar shape, defaults to circular
+        heightController: _controller  // The controller previously initialized
+   )
+    ```
+6. To change the progress bar, use WaterController's method changeWaterHeight. Keep in mind that the progress bar is double from 0-1:
+        ```
+       _controller.changeWaterHeight(progress)
+       ```
     
 ## Example
 
